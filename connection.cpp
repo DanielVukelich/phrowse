@@ -11,7 +11,13 @@
 
 const unsigned int TIMEOUT_SECONDS = 10;
 const unsigned int TIMEOUT_USECONDS = 0;
+
 const unsigned int BUFFER_SIZE = 1024;
+
+const unsigned int FAST_RETRIES = 10;
+const unsigned int SLOW_RETRIES = 5;
+
+const unsigned int SLEEP_USECONDS = 100000;
 
 using std::ostringstream;
 using std::string;
@@ -63,9 +69,12 @@ std::string Connection::get_response(){
     if(!connected){
         throw runtime_error("Not connected to server!");
     }
+
     char* buf = new char[BUFFER_SIZE];
     bool receiving = true;
     string response;
+    unsigned int consec_empty = 0;
+
     while(receiving){
         ssize_t rec = recv(sockFD, (void*) buf, BUFFER_SIZE, 0);
         if(rec == -1){
@@ -80,8 +89,17 @@ std::string Connection::get_response(){
             }
         }else{
             if(!rec){
-                receiving = (response.find("\r\n.\r\n") != string::npos);
+                receiving = (response.find("\r\n.\r\n") == string::npos);
+                if(consec_empty > FAST_RETRIES){
+                    if(consec_empty > FAST_RETRIES + SLOW_RETRIES){
+                        receiving = false;
+                        continue;
+                    }
+                    usleep(SLEEP_USECONDS);
+                }
+                ++consec_empty;
             }else{
+                consec_empty = 0;
                 response.append(buf, rec);
             }
         }
