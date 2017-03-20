@@ -41,13 +41,21 @@ int main(int argc, char** argv){
     }
     Connection conn;
     conn.set_host(host);
-    try{
-        conn.open();
-    }catch(runtime_error e){
-        cout << "Error: " << e.what() << endl;
-        return 0;
-    }
 
-    cout << conn.request("\r\n") << endl;
+    string query;
+    cout << ">";
+    while(std::getline(cin, query)){
+        query.append("\r\n");
+        try{
+            conn.open();
+        }catch(runtime_error e){
+            cout << "Error: " << e.what() << endl;
+            continue;
+        }
+        cout << conn.request(query) << endl;
+        conn.close_conn();
+        cout << ">";
+    }
+    cout << endl;
     return 0;
 }
