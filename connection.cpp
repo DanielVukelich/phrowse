@@ -11,13 +11,11 @@
 
 const unsigned int TIMEOUT_SECONDS = 10;
 const unsigned int TIMEOUT_USECONDS = 0;
-
 const unsigned int BUFFER_SIZE = 1024;
-
 const unsigned int FAST_RETRIES = 10;
 const unsigned int SLOW_RETRIES = 5;
-
 const unsigned int SLEEP_USECONDS = 100000;
+const char* TERMINATING = "\r\n.\r\n";
 
 using std::ostringstream;
 using std::string;
@@ -89,7 +87,12 @@ std::string Connection::get_response(){
             }
         }else{
             if(!rec){
-                receiving = (response.find("\r\n.\r\n") == string::npos);
+
+                receiving =
+                    (response.find(TERMINATING,
+                                  response.size() - strlen(TERMINATING) + 2)
+                    == string::npos);
+
                 if(consec_empty > FAST_RETRIES){
                     if(consec_empty > FAST_RETRIES + SLOW_RETRIES){
                         receiving = false;
