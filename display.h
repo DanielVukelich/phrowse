@@ -15,6 +15,7 @@ public:
     MenuItem get_item();
     bool get_line(std::string& dest);
 private:
+    void move_cursor(int amount);
     Menu items;
     unsigned int selected_item;
     int wind_x, wind_y;

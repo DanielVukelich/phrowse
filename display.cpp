@@ -30,24 +30,24 @@ MenuItem Display::get_item(){
         int ch = getch();
         switch(ch){
         case KEY_DOWN:
-            selected_item = (selected_item > items.size()) ?
-                (items.size() - 1) : selected_item + 1;
+            move_cursor(1);
             break;
         case KEY_UP:
-            selected_item = selected_item ?
-                (selected_item - 1) : 0;
+            move_cursor(-1);
+            break;
+        case KEY_PPAGE:
+            move_cursor(-1 * wind_y);
+            break;
+        case KEY_NPAGE:
+            move_cursor(wind_y);
             break;
         case '\n':
             getting_input = false;
             break;
+        case EOT:
+            return Menu::no_item;
         default:
             break;
-        }
-        int selection_diff = (int) selected_item - (int) region_start;
-        if(selection_diff < 0){
-            region_start = selected_item;
-        }else if(selection_diff >= wind_y){
-            ++region_start;
         }
 
         draw_menu();
@@ -91,4 +91,23 @@ void Display::draw_menu(){
 void Display::set_menu(Menu new_menu){
     items = new_menu;
     selected_item = 0;
+}
+
+void Display::move_cursor(int amount){
+
+    int temp_sel_item = (int) selected_item + amount;
+    if(temp_sel_item < 0){
+        selected_item = 0;
+    }else if(temp_sel_item > (int) items.size()){
+        selected_item = items.size() - 1;
+    }else{
+        selected_item = (unsigned int) temp_sel_item;
+    }
+
+    int selection_diff = (int) selected_item - (int) region_start;
+    if(selection_diff < 0){
+        region_start = selected_item;
+    }else if(selection_diff >= wind_y){
+        region_start += amount;
+    }
 }

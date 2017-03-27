@@ -75,7 +75,10 @@ int main(int argc, char** argv){
         Menu men(conn.request(query));
         disp.set_menu(men);
         disp.draw_menu();
-        disp.get_item();
+        MenuItem it = disp.get_item();
+        if(it == Menu::no_item){
+            break;
+        }
         disp.print_prompt();
     }
 

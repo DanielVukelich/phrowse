@@ -6,6 +6,8 @@
 using std::string;
 using std::runtime_error;
 
+MenuItem Menu::no_item = MenuItem(true);
+
 Menu::Menu(){
 }
 
@@ -50,6 +52,7 @@ MenuItem& Menu::at(size_t pos){
 
 MenuItem::MenuItem(const string& gopher_line){
     const string DELIMITER("\t");
+    isEmpty = false;
 
     size_t firsttab = gopher_line.find(DELIMITER);
     if(firsttab == string::npos){
@@ -66,6 +69,15 @@ MenuItem::MenuItem(const string& gopher_line){
     selector_string = gopher_line.substr(firsttab + 1);
 }
 
+bool MenuItem::operator==(const MenuItem other){
+    if(other.isEmpty && isEmpty){
+        return true;
+    }
+    return other.item_type == item_type &&
+        other.item_text == item_text &&
+        other.selector_string == selector_string;
+}
+
 string MenuItem::get_selector(){
     return selector_string;
 }
@@ -76,4 +88,8 @@ string MenuItem::get_text(){
 
 char MenuItem::get_type(){
     return item_type;
+}
+
+MenuItem::MenuItem(bool empty){
+    isEmpty = empty;
 }
