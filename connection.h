@@ -1,6 +1,8 @@
 #ifndef _CONNECTION_H
 #define _CONNECTION_H
 
+#include "menu.h"
+
 #include <string>
 #include <unordered_map>
 
@@ -12,6 +14,7 @@ public:
     void set_host(const std::string& host);
     std::string request(const std::string& request, const std::string& host);
     std::string request(const std::string& request);
+    std::string request(const MenuItem& item);
 private:
     void open();
     void close_conn();

@@ -18,6 +18,7 @@ const unsigned int SLEEP_USECONDS = 100000;
 const char* TERMINATING = "\r\n.\r\n";
 
 using std::ostringstream;
+using std::stringstream;
 using std::string;
 using std::runtime_error;
 
@@ -55,6 +56,26 @@ void Connection::set_host(const string& host){
         hostname = host.substr(0, pos);
         port = host.substr(pos + 1);
     }
+}
+
+string Connection::request(const MenuItem& item){
+    string req, host, port;
+    stringstream ss(item.get_selector());
+    switch(item.get_type()){
+    case '0':
+    case '1':
+        getline(ss, req, '\t');
+        getline(ss, host, '\t');
+        getline(ss, port, '\t');
+        host.append("\t");
+        host.append(port);
+        set_host(host);
+        break;
+    default:
+        return string();
+    }
+    req.append("\r\n");
+    return request(req);
 }
 
 string Connection::request(const string& request, const string& host){

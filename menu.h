@@ -8,10 +8,13 @@ class MenuItem{
     friend class Menu;
 public:
     MenuItem(const std::string& gopher_line);
-    std::string get_text();
-    std::string get_selector();
-    char get_type();
-    bool operator==(const MenuItem other);
+    MenuItem();
+    std::string get_text() const;
+    std::string get_selector() const;
+    char get_type() const;
+    bool operator==(const MenuItem other) const;
+    bool operator!=(const MenuItem other) const;
+    MenuItem operator=(const MenuItem other);
 private:
     MenuItem(bool empty);
     char item_type;
@@ -23,6 +26,7 @@ private:
 class Menu{
 public:
     Menu(const std::string& gopher_doc);
+    Menu(const std::string& gopher_doc, MenuItem doc_item);
     Menu();
     size_t size();
     MenuItem& at(size_t pos);
@@ -30,6 +34,7 @@ public:
     static MenuItem no_item;
 private:
     std::vector<MenuItem> items;
+    std::vector<std::string> get_lines(const std::string& gopher_doc);
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 
+using std::vector;
 using std::string;
 using std::runtime_error;
 
@@ -12,8 +13,51 @@ Menu::Menu(){
 }
 
 Menu::Menu(const string& gopher_doc){
+    vector<string> lines = get_lines(gopher_doc);
+    for(unsigned int i = 0; i < lines.size(); ++i){
+        items.emplace_back(lines.at(i));
+    }
+}
+
+Menu::Menu(const string& gopher_doc, MenuItem doc_item){
+    vector<string> lines = get_lines(gopher_doc);
+    for(unsigned int i = 0; i < lines.size(); ++i){
+
+        switch(doc_item.get_type()){
+        case '0':
+        {
+            MenuItem newItem;
+            newItem.item_type = 'i';
+            newItem.item_text = lines.at(i);
+            newItem.selector_string = "";
+            items.push_back(newItem);
+        }
+            break;
+        case '1':
+            items.emplace_back(lines.at(i));
+            break;
+        default:
+            break;
+        }
+
+    }
+}
+
+void Menu::print_items(){
+    for(unsigned int i = 0; i < items.size(); ++i){
+        std::cout << items.at(i).get_text();
+        if(items.at(i).get_type() != 'i'){
+            std::cout << "\t" << items.at(i).get_selector();
+        }
+        std::cout << std::endl;
+    }
+}
+
+vector<string> Menu::get_lines(const string& gopher_doc){
     bool finding_items = true;
     size_t last_pos = 0;
+    vector<string> lines;
+
     const string DELIMITER("\r\n");
     while(finding_items){
         size_t new_pos = gopher_doc.find(DELIMITER, last_pos);
@@ -28,18 +72,9 @@ Menu::Menu(const string& gopher_doc){
             continue;
         }
         last_pos = new_pos + DELIMITER.length();
-        items.emplace_back(itemstring);
+        lines.push_back(itemstring);
     }
-}
-
-void Menu::print_items(){
-    for(unsigned int i = 0; i < items.size(); ++i){
-        std::cout << items.at(i).get_text();
-        if(items.at(i).get_type() != 'i'){
-            std::cout << "\t" << items.at(i).get_selector();
-        }
-        std::cout << std::endl;
-    }
+    return lines;
 }
 
 size_t Menu::size(){
@@ -69,7 +104,7 @@ MenuItem::MenuItem(const string& gopher_line){
     selector_string = gopher_line.substr(firsttab + 1);
 }
 
-bool MenuItem::operator==(const MenuItem other){
+bool MenuItem::operator==(const MenuItem other) const{
     if(other.isEmpty && isEmpty){
         return true;
     }
@@ -78,16 +113,32 @@ bool MenuItem::operator==(const MenuItem other){
         other.selector_string == selector_string;
 }
 
-string MenuItem::get_selector(){
+bool MenuItem::operator!=(const MenuItem other) const{
+    return !(*this == other);
+}
+MenuItem MenuItem::operator=(const MenuItem other){
+    item_type = other.item_type;
+    item_text = other.item_text;
+    selector_string = other.selector_string;
+    isEmpty = other.isEmpty;
+    return other;
+}
+
+string MenuItem::get_selector() const{
     return selector_string;
 }
 
-string MenuItem::get_text(){
+string MenuItem::get_text() const {
     return item_text;
 }
 
-char MenuItem::get_type(){
+char MenuItem::get_type() const{
     return item_type;
+}
+
+
+MenuItem::MenuItem(){
+    isEmpty = false;
 }
 
 MenuItem::MenuItem(bool empty){

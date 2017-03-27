@@ -13,7 +13,6 @@ Display::Display(){
     keypad(stdscr, true);
     selected_item = 0;
     region_start = 0;
-
 }
 
 Display::~Display(){

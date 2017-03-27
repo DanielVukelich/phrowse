@@ -69,17 +69,21 @@ int main(int argc, char** argv){
     get_args(argc, argv, host, disp);
     Connection conn(host);
 
-    while(disp.get_line(query)){
-
-        query.append("\r\n");
-        Menu men(conn.request(query));
-        disp.set_menu(men);
-        disp.draw_menu();
-        MenuItem it = disp.get_item();
-        if(it == Menu::no_item){
+    disp.get_line(query);
+    query.append("\r\n");
+    Menu men(conn.request(query));
+    disp.set_menu(men);
+    disp.draw_menu();
+    MenuItem item;
+    while((item = disp.get_item()) != Menu::no_item){
+        if(item == Menu::no_item){
             break;
         }
-        disp.print_prompt();
+        string response = conn.request(item);
+
+        men = Menu(response, item);
+        disp.set_menu(men);
+        disp.draw_menu();
     }
 
     return 0;
