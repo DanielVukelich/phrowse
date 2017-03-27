@@ -1,8 +1,8 @@
 CXX=g++
 INC_DIR=src
 CXXFLAGS=-std=c++11 -Werror -Wall -I$(INC_DIR)
-LDLIBS=
-OBJS=client.o connection.o
+LDLIBS=-lncurses
+OBJS=client.o connection.o menu.o display.o
 BIN=gopher
 
 release:	$(BIN)

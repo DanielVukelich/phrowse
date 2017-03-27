@@ -30,7 +30,6 @@ Connection::Connection(const string& host){
     sockFD = 0;
     connected = false;
     set_host(host);
-    open();
 }
 
 Connection::~Connection(){
@@ -38,7 +37,9 @@ Connection::~Connection(){
 }
 
 void Connection::close_conn(){
-    close(sockFD);
+    if(connected){
+        close(sockFD);
+    }
     connected = false;
 }
 
@@ -56,14 +57,30 @@ void Connection::set_host(const string& host){
     }
 }
 
-std::string Connection::request(const string& request){
-    if(send_str(request)){
-        return get_response();
+string Connection::request(const string& request, const string& host){
+    set_host(host);
+    return this->request(request);
+}
+
+string Connection::request(const string& request){
+    string cache_key = hostname + port + request;
+    auto it = cache.find(cache_key);
+
+    if(it != cache.end()){
+        return it->second;
     }
+
+    open();
+    if(send_str(request)){
+        it = cache.emplace(cache_key, get_response()).first;
+        close_conn();
+        return it->second;
+    }
+    close_conn();
     return string();
 }
 
-std::string Connection::get_response(){
+string Connection::get_response(){
     if(!connected){
         throw runtime_error("Not connected to server!");
     }

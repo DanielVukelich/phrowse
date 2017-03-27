@@ -1,9 +1,12 @@
 #include "connection.h"
+#include "menu.h"
+#include "display.h"
 
 #include <iostream>
 #include <string>
 #include <stdint.h>
 #include <stdexcept>
+#include <unistd.h>
 
 using std::string;
 using std::cout;
@@ -16,17 +19,32 @@ void print_usage(char* argv0){
     return;
 }
 
-int main(int argc, char** argv){
-    string host;
+void get_args(int argc, char** argv, string& host, Display& disp){
+    host = "";
     if(argc == 2){
         host = string(argv[1]);
         if(!host.compare("-h") || !host.compare("--help")){
+            disp.~Display();
             print_usage(argv[0]);
-            return 0;
+            exit(EXIT_SUCCESS);
         }
     }else if(argc > 2){
-        print_usage(argv[0]);
-        return 0;
+#ifdef DEBUG
+        //If a debug build is launched with commandline arg 'g', then tell the user
+        //what the pid is and wait until it's been attached
+        if(argc == 3 && argv[2][0] == 'g' && argv[2][1] == '\0'){
+            char await;
+            host = string(argv[1]);
+            std::cout << "Attach debugger to pid " << getpid() << "\nInput any character to continue";
+            std::cin >> await;
+        }else{
+#endif
+            disp.~Display();
+            print_usage(argv[0]);
+            exit(EXIT_FAILURE);
+#ifdef DEBUG
+        }
+#endif
     }else{
         cout << "Enter <hostname:port>.  Port defaults to 70."
              << endl << ">";
@@ -39,23 +57,27 @@ int main(int argc, char** argv){
     }else{
         host.append("\t70");
     }
-    Connection conn;
-    conn.set_host(host);
+    return;
+}
 
+int main(int argc, char** argv){
+
+    Display disp;
     string query;
-    cout << ">";
-    while(std::getline(cin, query)){
+    disp.print_prompt();
+    string host;
+    get_args(argc, argv, host, disp);
+    Connection conn(host);
+
+    while(disp.get_line(query)){
+
         query.append("\r\n");
-        try{
-            conn.open();
-        }catch(runtime_error e){
-            cout << "Error: " << e.what() << endl;
-            continue;
-        }
-        cout << conn.request(query) << endl;
-        conn.close_conn();
-        cout << ">";
+        Menu men(conn.request(query));
+        disp.set_menu(men);
+        disp.draw_menu();
+        disp.get_item();
+        disp.print_prompt();
     }
-    cout << endl;
+
     return 0;
 }
