@@ -120,7 +120,7 @@ int main(int argc, char** argv){
         }
         string response = conn.request(item);
 
-        men = Menu(response, item);
+        men = Menu(response, item.get_type());
         if(!last_item_was_fut){
             history.push(item);
         }

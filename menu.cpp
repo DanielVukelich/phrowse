@@ -14,23 +14,29 @@ MenuItem Menu::next_item = MenuItem(MenuItem::special_type::NEXT_ITEM);
 Menu::Menu(){
 }
 
-Menu::Menu(const string& gopher_doc){
-    vector<string> lines = get_lines(gopher_doc);
-    for(unsigned int i = 0; i < lines.size(); ++i){
-        items.emplace_back(lines.at(i));
+Menu::Menu(const string& gopher_doc, char doc_type){
+    vector<string> lines;
+    try{
+        lines = get_lines(gopher_doc, doc_type);
+        if(!lines.size() && gopher_doc.size()){
+            throw runtime_error("Couldn't parse lines.  Trying in text mode");
+        }
+    }catch(runtime_error e){
+        doc_type = '0';
+        lines = get_lines(gopher_doc, doc_type);
     }
-}
 
-Menu::Menu(const string& gopher_doc, MenuItem doc_item){
-    vector<string> lines = get_lines(gopher_doc);
     for(unsigned int i = 0; i < lines.size(); ++i){
 
-        switch(doc_item.get_type()){
+        switch(doc_type){
         case '0':
         {
             MenuItem newItem;
             newItem.item_type = 'i';
             newItem.item_text = lines.at(i);
+            if(newItem.item_text.back() == '\r'){
+                newItem.item_text.pop_back();
+            }
             newItem.selector_string = "";
             items.push_back(newItem);
         }
@@ -55,25 +61,43 @@ void Menu::print_items(){
     }
 }
 
-vector<string> Menu::get_lines(const string& gopher_doc){
+vector<string> Menu::get_lines(const string& gopher_doc,
+                               char doc_type){
+    string delimiter, terminator;
+    switch(doc_type){
+    case '0':
+        delimiter = "\n";
+        terminator = "";
+        break;
+    case '1':
+    default:
+        delimiter = "\r\n";
+        terminator = ".";
+        break;
+    }
+    return get_lines(gopher_doc, delimiter, terminator);
+}
+
+vector<string> Menu::get_lines(const string& gopher_doc,
+                               const string& delimiter,
+                               const string& terminator){
     bool finding_items = true;
     size_t last_pos = 0;
     vector<string> lines;
 
-    const string DELIMITER("\r\n");
     while(finding_items){
-        size_t new_pos = gopher_doc.find(DELIMITER, last_pos);
+        size_t new_pos = gopher_doc.find(delimiter, last_pos);
         if(new_pos == string::npos){
             finding_items = false;
             continue;
         }
 
         string itemstring = gopher_doc.substr(last_pos, new_pos - last_pos);
-        if(itemstring.size() == 1 && itemstring[0] == '.'){
+        if(terminator.size() && itemstring == terminator){
             finding_items = false;
             continue;
         }
-        last_pos = new_pos + DELIMITER.length();
+        last_pos = new_pos + delimiter.length();
         lines.push_back(itemstring);
     }
     return lines;

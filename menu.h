@@ -31,8 +31,8 @@ private:
 
 class Menu{
 public:
-    Menu(const std::string& gopher_doc);
-    Menu(const std::string& gopher_doc, MenuItem doc_item);
+    Menu(const std::string& gopher_doc, char doc_type);
+    Menu(const std::string& gopher_doc) : Menu(gopher_doc, '1'){}
     Menu();
     size_t size();
     MenuItem& at(size_t pos);
@@ -42,7 +42,11 @@ public:
     static MenuItem next_item;
 private:
     std::vector<MenuItem> items;
-    std::vector<std::string> get_lines(const std::string& gopher_doc);
+    std::vector<std::string> get_lines(const std::string& gopher_doc,
+                                       const std::string& delimiter,
+                                       const std::string& terminator);
+    std::vector<std::string> get_lines(const std::string& gopher_doc,
+                                       char doc_type);
 };
 
 #endif
