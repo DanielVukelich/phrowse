@@ -16,11 +16,17 @@ public:
     bool operator!=(const MenuItem other) const;
     MenuItem operator=(const MenuItem other);
 private:
-    MenuItem(bool empty);
+    enum special_type{
+        NO_ITEM,
+        PREV_ITEM,
+        NEXT_ITEM,
+        NORMAL
+    };
+    MenuItem(special_type type);
     char item_type;
     std::string item_text;
     std::string selector_string;
-    bool isEmpty;
+    special_type attr;
 };
 
 class Menu{
@@ -32,6 +38,8 @@ public:
     MenuItem& at(size_t pos);
     void print_items();
     static MenuItem no_item;
+    static MenuItem prev_item;
+    static MenuItem next_item;
 private:
     std::vector<MenuItem> items;
     std::vector<std::string> get_lines(const std::string& gopher_doc);

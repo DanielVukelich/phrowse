@@ -7,7 +7,9 @@ using std::vector;
 using std::string;
 using std::runtime_error;
 
-MenuItem Menu::no_item = MenuItem(true);
+MenuItem Menu::no_item = MenuItem(MenuItem::special_type::NO_ITEM);
+MenuItem Menu::prev_item = MenuItem(MenuItem::special_type::PREV_ITEM);
+MenuItem Menu::next_item = MenuItem(MenuItem::special_type::NEXT_ITEM);
 
 Menu::Menu(){
 }
@@ -87,7 +89,7 @@ MenuItem& Menu::at(size_t pos){
 
 MenuItem::MenuItem(const string& gopher_line){
     const string DELIMITER("\t");
-    isEmpty = false;
+    attr = special_type::NORMAL;
 
     size_t firsttab = gopher_line.find(DELIMITER);
     if(firsttab == string::npos){
@@ -105,9 +107,11 @@ MenuItem::MenuItem(const string& gopher_line){
 }
 
 bool MenuItem::operator==(const MenuItem other) const{
-    if(other.isEmpty && isEmpty){
-        return true;
+
+    if(attr != special_type::NORMAL){
+        return (attr == other.attr);
     }
+
     return other.item_type == item_type &&
         other.item_text == item_text &&
         other.selector_string == selector_string;
@@ -120,7 +124,7 @@ MenuItem MenuItem::operator=(const MenuItem other){
     item_type = other.item_type;
     item_text = other.item_text;
     selector_string = other.selector_string;
-    isEmpty = other.isEmpty;
+    attr = other.attr;
     return other;
 }
 
@@ -138,9 +142,9 @@ char MenuItem::get_type() const{
 
 
 MenuItem::MenuItem(){
-    isEmpty = false;
+    attr = special_type::NORMAL;
 }
 
-MenuItem::MenuItem(bool empty){
-    isEmpty = empty;
+MenuItem::MenuItem(special_type type){
+    attr = type;
 }

@@ -28,6 +28,10 @@ MenuItem Display::get_item(){
     while(getting_input){
         int ch = getch();
         switch(ch){
+        case KEY_LEFT:
+            return Menu::prev_item;
+        case KEY_RIGHT:
+            return Menu::next_item;
         case KEY_DOWN:
             move_cursor(1);
             break;

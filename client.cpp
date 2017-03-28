@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <stdexcept>
 #include <unistd.h>
+#include <stack>
 
+using std::stack;
 using std::string;
 using std::cout;
 using std::endl;
@@ -70,18 +72,58 @@ int main(int argc, char** argv){
     Connection conn(host);
 
     disp.get_line(query);
+    if(!query.size()){
+        query.append("/");
+    }
+
+    string first_page_item = "1\t";
+    first_page_item.append(query);
+    first_page_item.append("\t");
+    first_page_item.append(host);
+
     query.append("\r\n");
     Menu men(conn.request(query));
     disp.set_menu(men);
     disp.draw_menu();
     MenuItem item;
+
+    bool last_item_was_fut = false;
+    MenuItem firstpage(first_page_item);
+    stack<MenuItem> history;
+    history.push(firstpage);
+    stack<MenuItem> future;
+
     while((item = disp.get_item()) != Menu::no_item){
         if(item == Menu::no_item){
             break;
+        }else if(item == Menu::prev_item){
+            if(history.size() < 2){
+                continue;
+            }
+            last_item_was_fut = false;
+            item = history.top();
+            history.pop();
+            future.push(item);
+            item = history.top();
+            history.pop();
+        }else if(item == Menu::next_item){
+            if(!future.size()){
+                continue;
+            }
+            last_item_was_fut = true;
+            item = future.top();
+            future.pop();
+            history.push(item);
+        }else{
+            last_item_was_fut = false;
+            future = stack<MenuItem>();
         }
         string response = conn.request(item);
 
         men = Menu(response, item);
+        if(!last_item_was_fut){
+            history.push(item);
+        }
         disp.set_menu(men);
         disp.draw_menu();
     }
