@@ -15,7 +15,7 @@ using std::make_pair;
 Display::Display(){
     initscr();
     wind_y = stdscr->_maxy;
-    wind_x = stdscr->_maxx + 1;
+    wind_x = stdscr->_maxx;
     raw();
     noecho();
     keypad(stdscr, true);
@@ -128,6 +128,10 @@ void Display::draw_menu(){
 
 bool Display::is_printable(char c){
     return (c != '\r');
+}
+
+int Display::get_display_width(){
+    return wind_x;
 }
 
 void Display::set_menu(Menu new_menu){

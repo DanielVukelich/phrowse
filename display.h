@@ -17,6 +17,7 @@ public:
     MenuItem get_item();
     bool get_line(std::string& dest);
     void jump_to(std::pair<unsigned int, unsigned int> indices);
+    int get_display_width();
     std::pair<unsigned int, unsigned int> get_last_sel();
 private:
     void move_cursor(int amount);

@@ -10,6 +10,7 @@ using std::runtime_error;
 MenuItem Menu::no_item = MenuItem(MenuItem::special_type::NO_ITEM);
 MenuItem Menu::prev_item = MenuItem(MenuItem::special_type::PREV_ITEM);
 MenuItem Menu::next_item = MenuItem(MenuItem::special_type::NEXT_ITEM);
+int Menu::display_width = 40;
 
 Menu::Menu(){
 }
@@ -48,6 +49,10 @@ Menu::Menu(const string& gopher_doc, char doc_type){
     }
 }
 
+void Menu::set_display_width(int width){
+    display_width = width;
+}
+
 void Menu::print_items(){
     for(unsigned int i = 0; i < items.size(); ++i){
         std::cout << items.at(i).get_text();
@@ -61,23 +66,27 @@ void Menu::print_items(){
 vector<string> Menu::get_lines(const string& gopher_doc,
                                char doc_type){
     string delimiter, terminator;
+    int width;
     switch(doc_type){
     case '0':
         delimiter = "\n";
         terminator = "";
+        width = display_width;
         break;
     case '1':
     default:
         delimiter = "\r\n";
         terminator = ".";
+        width = -1;
         break;
     }
-    return get_lines(gopher_doc, delimiter, terminator);
+    return get_lines(gopher_doc, delimiter, terminator, width);
 }
 
 vector<string> Menu::get_lines(const string& gopher_doc,
                                const string& delimiter,
-                               const string& terminator){
+                               const string& terminator,
+                               int max_line_len){
     bool finding_items = true;
     size_t last_pos = 0;
     vector<string> lines;
@@ -89,12 +98,22 @@ vector<string> Menu::get_lines(const string& gopher_doc,
             continue;
         }
 
+        bool truncated_line = false;
+        if((max_line_len > 0) && ((new_pos - last_pos) > (unsigned int) max_line_len)){
+            new_pos = last_pos + max_line_len;
+            truncated_line = true;
+        }
+
         string itemstring = gopher_doc.substr(last_pos, new_pos - last_pos);
         if(terminator.size() && itemstring == terminator){
             finding_items = false;
             continue;
         }
-        last_pos = new_pos + delimiter.length();
+
+        last_pos = new_pos;
+        if(!truncated_line){
+            last_pos += delimiter.length();
+        }
         lines.push_back(itemstring);
     }
     return lines;

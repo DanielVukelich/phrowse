@@ -64,9 +64,10 @@ void get_args(int argc, char** argv, string& host, Display& disp){
 int main(int argc, char** argv){
 
     Display disp;
-    string query;
+    Menu::set_display_width(disp.get_display_width());
     disp.print_prompt();
-    string host;
+
+    string host, query;
     get_args(argc, argv, host, disp);
     Connection conn(host);
 
@@ -82,6 +83,7 @@ int main(int argc, char** argv){
 
     query.append("\r\n");
     Menu men(conn.request(query));
+
     disp.set_menu(men);
     disp.draw_menu();
 
