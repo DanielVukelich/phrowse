@@ -11,6 +11,7 @@ public:
     MenuItem();
     std::string get_text() const;
     std::string get_selector() const;
+    std::string describe_item() const;
     char get_type() const;
     bool operator==(const MenuItem other) const;
     bool operator!=(const MenuItem other) const;

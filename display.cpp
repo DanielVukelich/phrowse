@@ -2,17 +2,20 @@
 
 #include <ncurses.h>
 #include <string>
+#include <sstream>
 
 #define ALT_BACKSPACE 127
 #define EOT 4
 
+using std::ostringstream;
 using std::string;
 using std::pair;
 using std::make_pair;
 
 Display::Display(){
     initscr();
-    wind_y = stdscr->_maxy + 1;
+    wind_y = stdscr->_maxy;
+    wind_x = stdscr->_maxx + 1;
     raw();
     noecho();
     keypad(stdscr, true);
@@ -108,6 +111,18 @@ void Display::draw_menu(){
         printw("\n");
         standend();
     }
+
+    ostringstream oss;
+    oss << "Selected item: ";
+    oss << items.at(selected_item).describe_item() << " | ";
+    oss << "Line " << selected_item + 1 << "/" << items.size();
+    move(wind_y + 1, 0);
+
+    attron(A_REVERSE | A_STANDOUT);
+    printw(oss.str().c_str());
+    standend();
+
+
     refresh();
 }
 
@@ -133,7 +148,7 @@ void Display::move_cursor(int amount){
     int temp_sel_item = (int) selected_item + amount;
     if(temp_sel_item < 0){
         selected_item = 0;
-    }else if(temp_sel_item > (int) items.size()){
+    }else if(temp_sel_item >= (int) items.size()){
         selected_item = items.size() - 1;
     }else{
         selected_item = (unsigned int) temp_sel_item;

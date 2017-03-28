@@ -108,6 +108,43 @@ MenuItem& Menu::at(size_t pos){
     return items.at(pos);
 }
 
+string MenuItem::describe_item() const{
+    switch(item_type){
+    case '0':
+        return string("File");
+    case '1':
+        return string("Gopher menu");
+    case '2':
+        return string("CSO server");
+    case '3':
+        return string("Error message");
+    case '4':
+        return string("Macintosh file");
+    case '5':
+        return string("DOS binary archive");
+    case '6':
+        return string("UNIX uuencoded file");
+    case '7':
+        return string("Index-Search server");
+    case '8':
+        return string("Telnet session");
+    case '9':
+        return string("Binary file");
+    case '+':
+        return string("Redundant server");
+    case 'T':
+        return string("tn3270 session");
+    case 'g':
+        return string("GIF image");
+    case 'i':
+        return string("Text/Information");
+    case 'I':
+        return string("Image");
+    default:
+        return string("Unknown item");
+    }
+}
+
 MenuItem::MenuItem(const string& gopher_line){
     const string DELIMITER("\t");
     attr = special_type::NORMAL;
