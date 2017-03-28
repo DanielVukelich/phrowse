@@ -34,9 +34,6 @@ Menu::Menu(const string& gopher_doc, char doc_type){
             MenuItem newItem;
             newItem.item_type = 'i';
             newItem.item_text = lines.at(i);
-            if(newItem.item_text.back() == '\r'){
-                newItem.item_text.pop_back();
-            }
             newItem.selector_string = "";
             items.push_back(newItem);
         }

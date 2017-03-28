@@ -24,7 +24,7 @@ private:
     unsigned int selected_item, region_start;
     int wind_x, wind_y;
     unsigned int last_selected_item, last_region_start;
-
+    bool is_printable(char c);
 };
 
 #endif

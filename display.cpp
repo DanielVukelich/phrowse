@@ -1,10 +1,12 @@
 #include "display.h"
 
 #include <ncurses.h>
+#include <string>
 
 #define ALT_BACKSPACE 127
 #define EOT 4
 
+using std::string;
 using std::pair;
 using std::make_pair;
 
@@ -96,12 +98,21 @@ void Display::draw_menu(){
         if(selected_item == i){
             attron(A_REVERSE);
         }
-        MenuItem it = items.at(i);
-        printw(it.get_text().c_str());
+        string it = items.at(i).get_text();
+        for(unsigned int k = 0; k < it.length(); ++k){
+            char c = it.at(k);
+            if(is_printable(c)){
+                addch(c);
+            }
+        }
         printw("\n");
         standend();
     }
     refresh();
+}
+
+bool Display::is_printable(char c){
+    return (c != '\r');
 }
 
 void Display::set_menu(Menu new_menu){
