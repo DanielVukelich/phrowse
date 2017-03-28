@@ -1,15 +1,14 @@
 #include "connection.h"
 #include "menu.h"
 #include "display.h"
+#include "history.h"
 
 #include <iostream>
 #include <string>
 #include <stdint.h>
 #include <stdexcept>
 #include <unistd.h>
-#include <stack>
 
-using std::stack;
 using std::string;
 using std::cout;
 using std::endl;
@@ -85,46 +84,38 @@ int main(int argc, char** argv){
     Menu men(conn.request(query));
     disp.set_menu(men);
     disp.draw_menu();
-    MenuItem item;
 
-    bool last_item_was_fut = false;
     MenuItem firstpage(first_page_item);
-    stack<MenuItem> history;
-    history.push(firstpage);
-    stack<MenuItem> future;
 
-    while((item = disp.get_item()) != Menu::no_item){
-        if(item == Menu::no_item){
-            break;
-        }else if(item == Menu::prev_item){
-            if(history.size() < 2){
-                continue;
-            }
-            last_item_was_fut = false;
-            item = history.top();
-            history.pop();
-            future.push(item);
-            item = history.top();
-            history.pop();
-        }else if(item == Menu::next_item){
-            if(!future.size()){
-                continue;
-            }
-            last_item_was_fut = true;
-            item = future.top();
-            future.pop();
-            history.push(item);
+    BrowserHistory hist;
+    hist.add_item(firstpage);
+    HistoryItem to_visit;
+
+    while((to_visit = HistoryItem(disp.get_item())).get_item() != Menu::no_item){
+
+        if(to_visit.get_item() == Menu::prev_item){
+            to_visit = hist.go_back();
+        }else if(to_visit.get_item() == Menu::next_item){
+            to_visit = hist.go_forward();
         }else{
-            last_item_was_fut = false;
-            future = stack<MenuItem>();
+            hist.clear_future();
+            hist.set_hist_indices(disp.get_last_sel());
         }
-        string response = conn.request(item);
 
-        men = Menu(response, item.get_type());
-        if(!last_item_was_fut){
-            history.push(item);
+        //If the user is trying to go fwd/back but there is no history,
+        //do nothing
+        if(to_visit.get_item() == Menu::no_item){
+            continue;
         }
+
+        string response = conn.request(to_visit.get_item());
+
+        men = Menu(response, to_visit.get_item().get_type());
+
+        hist.add_item(to_visit);
+
         disp.set_menu(men);
+        disp.jump_to(to_visit.get_indices());
         disp.draw_menu();
     }
 

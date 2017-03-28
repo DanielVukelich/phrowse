@@ -5,6 +5,9 @@
 #define ALT_BACKSPACE 127
 #define EOT 4
 
+using std::pair;
+using std::make_pair;
+
 Display::Display(){
     initscr();
     wind_y = stdscr->_maxy + 1;
@@ -57,7 +60,13 @@ MenuItem Display::get_item(){
 
         draw_menu();
     }
+    last_selected_item = selected_item;
+    last_region_start = region_start;
     return items.at(selected_item);
+}
+
+pair<unsigned int, unsigned int> Display::get_last_sel(){
+    return make_pair(last_selected_item, last_region_start);
 }
 
 bool Display::get_line(std::string& dest){
@@ -97,6 +106,13 @@ void Display::set_menu(Menu new_menu){
     items = new_menu;
     selected_item = 0;
     region_start = 0;
+}
+
+void Display::jump_to(pair<unsigned int, unsigned int> indices){
+    last_selected_item = selected_item;
+    last_region_start = region_start;
+    selected_item = indices.first;
+    region_start = indices.second;
 }
 
 void Display::move_cursor(int amount){
