@@ -45,7 +45,9 @@ MenuItem Display::get_item(){
             move_cursor(wind_y);
             break;
         case '\n':
-            getting_input = false;
+            if(items.at(selected_item).get_type() != 'i'){
+                getting_input = false;
+            }
             break;
         case EOT:
             return Menu::no_item;
