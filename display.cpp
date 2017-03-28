@@ -32,6 +32,8 @@ MenuItem Display::get_item(){
         int ch = getch();
         switch(ch){
         case KEY_LEFT:
+            last_selected_item = selected_item;
+            last_region_start = region_start;
             return Menu::prev_item;
         case KEY_RIGHT:
             return Menu::next_item;

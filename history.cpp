@@ -50,6 +50,12 @@ void BrowserHistory::set_hist_indices(pair<unsigned int, unsigned int> indices){
     }
 }
 
+void BrowserHistory::set_fut_indices(pair<unsigned int, unsigned int> indices){
+    if(future.size() == 1){
+        future.top().set_indices(indices);
+    }
+}
+
 HistoryItem BrowserHistory::go_forward(){
     if(!future.size()){
         return HistoryItem(Menu::no_item);

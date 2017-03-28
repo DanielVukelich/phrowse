@@ -29,6 +29,7 @@ public:
     void add_item(MenuItem item);
     void add_item(HistoryItem item);
     void set_hist_indices(std::pair<unsigned int, unsigned int> indices);
+    void set_fut_indices(std::pair<unsigned int, unsigned int> indices);
 private:
     std::stack<HistoryItem> history;
     std::stack<HistoryItem> future;

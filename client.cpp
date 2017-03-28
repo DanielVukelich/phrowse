@@ -95,6 +95,7 @@ int main(int argc, char** argv){
 
         if(to_visit.get_item() == Menu::prev_item){
             to_visit = hist.go_back();
+            hist.set_fut_indices(disp.get_last_sel());
         }else if(to_visit.get_item() == Menu::next_item){
             to_visit = hist.go_forward();
         }else{
