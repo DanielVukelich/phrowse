@@ -94,6 +94,7 @@ void Display::draw_menu(){
 void Display::set_menu(Menu new_menu){
     items = new_menu;
     selected_item = 0;
+    region_start = 0;
 }
 
 void Display::move_cursor(int amount){
