@@ -159,8 +159,12 @@ string MenuItem::describe_item() const{
         return string("Text/Information");
     case 'I':
         return string("Image");
+    case 'h':
+        return string("HTTP link");
     default:
-        return string("Unknown item");
+        string s("Unknown item: ");
+        s.push_back(item_type);
+        return s;
     }
 }
 
