@@ -3,7 +3,7 @@ INC_DIR=src
 CXXFLAGS=-std=c++11 -Werror -Wall -I$(INC_DIR)
 LDLIBS=-lncurses
 OBJS=client.o connection.o menu.o display.o history.o
-BIN=gopher
+BIN=phrowse
 
 release:	$(BIN)
 
@@ -20,4 +20,4 @@ $(BIN): $(OBJS)
 
 clean:
 	rm -f $(BIN)
-	rm -r $(OBJS)
+	rm -f $(OBJS)
