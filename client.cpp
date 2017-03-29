@@ -80,9 +80,14 @@ int main(int argc, char** argv){
     first_page_item.append(query);
     first_page_item.append("\t");
     first_page_item.append(host);
-
     query.append("\r\n");
-    Menu men(conn.request(query));
+
+    Menu men;
+    try{
+        men = Menu(conn.request(query));
+    }catch(runtime_error e){
+        men = Menu::from_exception(e.what());
+    }
 
     disp.set_menu(men);
     disp.draw_menu();
