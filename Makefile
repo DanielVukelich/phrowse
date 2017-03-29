@@ -2,7 +2,7 @@ CXX=g++
 INC_DIR=src
 CXXFLAGS=-std=c++11 -Werror -Wall -I$(INC_DIR)
 LDLIBS=-lncurses
-OBJS=client.o connection.o menu.o display.o history.o
+OBJS=client.o connection.o menu.o display.o history.o guri.o
 BIN=phrowse
 
 release:	$(BIN)

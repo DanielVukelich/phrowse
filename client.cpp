@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "display.h"
 #include "history.h"
+#include "guri.h"
 
 #include <iostream>
 #include <string>
@@ -15,36 +16,31 @@ using std::cin;
 using std::runtime_error;
 
 void print_usage(char* argv0){
-    cout << "Usage: " << argv0 << " <hostname:port>" << endl;
+    cout << "Usage: " << argv0 << " [gopher://]<domain>[:port][/resource]" << endl;
     return;
 }
 
-void get_args(int argc, char** argv, string& host, Display& disp){
-    host = "";
+void get_args(int argc, char** argv, GURI& uri, Display& disp){
     if(argc == 2){
-        host = string(argv[1]);
-        if(!host.compare("-h") || !host.compare("--help")){
+        string arg = string(argv[1]);
+        if(!arg.compare("-h") || !arg.compare("--help")){
             disp.~Display();
             print_usage(argv[0]);
             exit(EXIT_SUCCESS);
         }
-    }else if(argc > 2){
+        try{
+            uri.set_uri(arg);
+            return;
+        }catch(runtime_error e){
             disp.~Display();
+            cout << e.what() << endl;
             print_usage(argv[0]);
             exit(EXIT_FAILURE);
-    }else{
-        cout << "Enter <hostname:port>.  Port defaults to 70."
-             << endl << ">";
-        cin >> host;
+        }
     }
-
-    size_t loc = host.find(":");
-    if(loc != string::npos){
-        host.at(loc) = '\t';
-    }else{
-        host.append("\t70");
-    }
-    return;
+    disp.~Display();
+    print_usage(argv[0]);
+    exit(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv){
@@ -53,14 +49,14 @@ int main(int argc, char** argv){
     Menu::set_display_width(disp.get_display_width());
     disp.print_prompt();
 
-    string host, query;
-    get_args(argc, argv, host, disp);
+
+    GURI uri;
+    get_args(argc, argv, uri, disp);
+
+    string host = uri.get_formatted_host('\t');
     Connection conn(host);
 
-    disp.get_line(query);
-    if(!query.size()){
-        query.append("/");
-    }
+    string query = uri.get_resource();
 
     string first_page_item = "1\t";
     first_page_item.append(query);
