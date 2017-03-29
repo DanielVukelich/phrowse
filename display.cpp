@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <string>
 #include <sstream>
+#include <unistd.h>
 
 #define ALT_BACKSPACE 127
 #define EOT 4
@@ -116,6 +117,9 @@ void Display::draw_menu(){
     oss << "Selected item: ";
     oss << items.at(selected_item).describe_item() << " | ";
     oss << "Line " << selected_item + 1 << "/" << items.size();
+#ifdef DEBUG
+    oss << " | Debug PID: " << getpid();
+#endif
     move(wind_y + 1, 0);
 
     attron(A_REVERSE | A_STANDOUT);
