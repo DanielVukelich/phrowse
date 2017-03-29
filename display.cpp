@@ -104,16 +104,18 @@ void Display::draw_menu(){
 
         if(selected_item == i){
             attron(A_REVERSE);
-            if(!it.size()){
-                it.append(" ");
-            }
         }
 
+        int printed_chars = 0;
         for(unsigned int k = 0; k < it.length(); ++k){
             char c = it.at(k);
             if(is_printable(c)){
                 addch(c);
+                ++printed_chars;
             }
+        }
+        if(!printed_chars && selected_item == i){
+            addch(' ');
         }
         printw("\n");
         standend();
