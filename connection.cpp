@@ -189,7 +189,7 @@ void Connection::open(){
 
     if (auto error =
             getaddrinfo(hostname.c_str(), port.c_str(), &hints, &servInfo)) {
-        ss << "getaddrinfo(): " << gai_strerror(error);
+        ss << "Couldn't find " << hostname << ": " << gai_strerror(error);
         throw runtime_error(ss.str());
     }
 
@@ -207,7 +207,8 @@ void Connection::open(){
 
         if (connect(sockFD, ptr->ai_addr, ptr->ai_addrlen) == -1) {
             if(errno != EINPROGRESS){
-                ss << "connect(): " << strerror(errno);
+                ss << "Connecting to " << hostname
+                   << " failed: "<< strerror(errno);
                 close(sockFD);
                 freeaddrinfo(servInfo);
                 throw runtime_error(ss.str());
@@ -222,7 +223,8 @@ void Connection::open(){
         if(select(sockFD+1, NULL, &set, NULL, &timeout) != 1){
             close(sockFD);
             freeaddrinfo(servInfo);
-            throw runtime_error("Connection timed out");
+            ss << "Connection to " << hostname << " timed out";
+            throw runtime_error(ss.str());
         }
 
         fcntl(sockFD, F_SETFL, fcntl(sockFD, F_GETFL, 0) & ~O_NONBLOCK);
@@ -234,7 +236,8 @@ void Connection::open(){
 
     if (!ptr) {
         close(sockFD);
-        throw runtime_error("Failed to connect");
+        ss << "Failed to connect to " << hostname << " on port " << port;
+        throw runtime_error(ss.str());
     }
 
     connected = true;

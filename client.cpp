@@ -111,8 +111,14 @@ int main(int argc, char** argv){
             continue;
         }
 
-        string response = conn.request(to_visit.get_item());
-
+        string response;
+        try{
+            response = conn.request(to_visit.get_item());
+        }catch(runtime_error e){
+            response = string("3ERROR ");
+            response.append(e.what());
+            response.append("\tNULL\tNULL\r\n.\r\n");
+        }
         men = Menu(response, to_visit.get_item().get_type());
 
         hist.add_item(to_visit);
