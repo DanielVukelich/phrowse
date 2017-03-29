@@ -99,10 +99,16 @@ void Display::draw_menu(){
         i < items.size() && j != (unsigned int) wind_y;
         ++i, ++j){
 
+        string it = items.at(i).get_text();
+
+
         if(selected_item == i){
             attron(A_REVERSE);
+            if(!it.size()){
+                it.append(" ");
+            }
         }
-        string it = items.at(i).get_text();
+
         for(unsigned int k = 0; k < it.length(); ++k){
             char c = it.at(k);
             if(is_printable(c)){

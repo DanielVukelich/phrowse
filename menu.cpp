@@ -185,6 +185,13 @@ MenuItem::MenuItem(const string& gopher_line){
     const string DELIMITER("\t");
     attr = special_type::NORMAL;
 
+    if(!gopher_line.size()){
+        item_type = 'i';
+        item_text = "";
+        selector_string = "NULL\tNULL";
+        return;
+    }
+
     size_t firsttab = gopher_line.find(DELIMITER);
     if(firsttab == string::npos){
         throw runtime_error("Couldn't parse menu item (no tabs)");
