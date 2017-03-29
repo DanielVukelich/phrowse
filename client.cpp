@@ -111,15 +111,12 @@ int main(int argc, char** argv){
             continue;
         }
 
-        string response;
         try{
-            response = conn.request(to_visit.get_item());
+            string response = conn.request(to_visit.get_item());
+            men = Menu(response, to_visit.get_item().get_type());
         }catch(runtime_error e){
-            response = string("3ERROR ");
-            response.append(e.what());
-            response.append("\tNULL\tNULL\r\n.\r\n");
+            men = Menu::from_exception(e.what());
         }
-        men = Menu(response, to_visit.get_item().get_type());
 
         hist.add_item(to_visit);
 

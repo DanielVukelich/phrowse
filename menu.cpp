@@ -1,11 +1,14 @@
 #include "menu.h"
 
+#include <sstream>
 #include <stdexcept>
 #include <iostream>
 
+using std::ostringstream;
 using std::vector;
 using std::string;
 using std::runtime_error;
+using std::exception;
 
 MenuItem Menu::no_item = MenuItem(MenuItem::special_type::NO_ITEM);
 MenuItem Menu::prev_item = MenuItem(MenuItem::special_type::PREV_ITEM);
@@ -13,6 +16,14 @@ MenuItem Menu::next_item = MenuItem(MenuItem::special_type::NEXT_ITEM);
 int Menu::display_width = 40;
 
 Menu::Menu(){
+}
+
+Menu Menu::from_exception(const std::string& what){
+    ostringstream ss;
+    ss << "3Error while loading page:\tNULL\tNULL\r\n"
+       << "3" << what << "\tNULL\tNULL\r\n"
+       << ".\r\n";
+    return Menu(ss.str(), '3');
 }
 
 Menu::Menu(const string& gopher_doc, char doc_type){
@@ -39,6 +50,7 @@ Menu::Menu(const string& gopher_doc, char doc_type){
             items.push_back(newItem);
         }
             break;
+        case '3':
         case '1':
             items.emplace_back(lines.at(i));
             break;
@@ -73,6 +85,7 @@ vector<string> Menu::get_lines(const string& gopher_doc,
         terminator = "";
         width = display_width;
         break;
+    case '3':
     case '1':
     default:
         delimiter = "\r\n";

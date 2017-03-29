@@ -34,6 +34,7 @@ class Menu{
 public:
     Menu(const std::string& gopher_doc, char doc_type);
     Menu(const std::string& gopher_doc) : Menu(gopher_doc, '1'){}
+    static Menu from_exception(const std::string& what);
     Menu();
     static void set_display_width(int width);
     size_t size();
