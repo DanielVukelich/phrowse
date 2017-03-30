@@ -13,11 +13,11 @@ public:
     ~Display();
     void set_menu(Menu new_menu);
     void draw_menu();
-    void print_prompt();
     MenuItem get_item();
-    bool get_line(std::string& dest);
     void jump_to(std::pair<unsigned int, unsigned int> indices);
     int get_display_width();
+    bool get_string(const char* prompt, std::string& result);
+    bool get_string(const std::string& prompt, std::string& result);
     std::pair<unsigned int, unsigned int> get_last_sel();
 private:
     void move_cursor(int amount);

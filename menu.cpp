@@ -50,6 +50,7 @@ Menu::Menu(const string& gopher_doc, char doc_type){
             items.push_back(newItem);
         }
             break;
+        case '7':
         case '3':
         case '1':
             items.emplace_back(lines.at(i));
@@ -85,6 +86,7 @@ vector<string> Menu::get_lines(const string& gopher_doc,
         terminator = "";
         width = display_width;
         break;
+    case '7':
     case '3':
     case '1':
     default:
@@ -248,4 +250,12 @@ MenuItem::MenuItem(){
 
 MenuItem::MenuItem(special_type type){
     attr = type;
+}
+
+void MenuItem::set_search(const std::string& query){
+    search = query;
+}
+
+string MenuItem::get_search() const{
+    return search;
 }

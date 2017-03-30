@@ -67,9 +67,19 @@ string Connection::request(const MenuItem& item){
         getline(ss, req, '\t');
         getline(ss, host, '\t');
         getline(ss, port, '\t');
-        host.append("\t");
+        host.push_back('\t');
         host.append(port);
         set_host(host);
+        break;
+    case '7':
+        getline(ss, req, '\t');
+        getline(ss, host, '\t');
+        getline(ss, port, '\t');
+        host.push_back('\t');
+        host.append(port);
+        set_host(host);
+        req.push_back('\t');
+        req.append(item.get_search());
         break;
     default:
         return string();

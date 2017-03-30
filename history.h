@@ -14,7 +14,7 @@ public:
     HistoryItem(MenuItem hist, std::pair<unsigned int, unsigned int> indices);
     std::pair<unsigned int, unsigned int> get_indices();
     void set_indices(std::pair<unsigned int, unsigned int> indices);
-    MenuItem get_item();
+    MenuItem& get_item();
 private:
     MenuItem item;
     std::pair<unsigned int, unsigned int> hist_indices;

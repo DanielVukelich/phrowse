@@ -47,8 +47,6 @@ int main(int argc, char** argv){
 
     Display disp;
     Menu::set_display_width(disp.get_display_width());
-    disp.print_prompt();
-
 
     GURI uri;
     get_args(argc, argv, uri, disp);
@@ -90,6 +88,15 @@ int main(int argc, char** argv){
         }else{
             hist.clear_future();
             hist.set_hist_indices(disp.get_last_sel());
+
+            if(to_visit.get_item().get_type() == '7'){
+                string query;
+                if(!disp.get_string("Enter a search query:", query)){
+                    //If the user canceled the search, exit
+                    break;
+                }
+                to_visit.get_item().set_search(query);
+            }
         }
 
         //If the user is trying to go fwd/back but there is no history,

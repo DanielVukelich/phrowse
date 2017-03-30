@@ -23,7 +23,7 @@ pair<unsigned int, unsigned int> HistoryItem::get_indices(){
     return hist_indices;
 }
 
-MenuItem HistoryItem::get_item(){
+MenuItem& HistoryItem::get_item(){
     return item;
 }
 

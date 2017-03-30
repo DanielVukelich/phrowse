@@ -12,6 +12,8 @@ public:
     std::string get_text() const;
     std::string get_selector() const;
     std::string describe_item() const;
+    void set_search(const std::string& query);
+    std::string get_search() const;
     char get_type() const;
     bool operator==(const MenuItem other) const;
     bool operator!=(const MenuItem other) const;
@@ -27,6 +29,7 @@ private:
     char item_type;
     std::string item_text;
     std::string selector_string;
+    std::string search;
     special_type attr;
 };
 

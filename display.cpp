@@ -5,9 +5,9 @@
 #include <sstream>
 #include <unistd.h>
 
-#define ALT_BACKSPACE 127
-#define EOT 4
-#define ETX 3
+#define BACKSPACE 127
+#define CTRLD 4
+#define CTRLC 3
 
 using std::ostringstream;
 using std::string;
@@ -27,10 +27,6 @@ Display::Display(){
 
 Display::~Display(){
     endwin();
-}
-
-void Display::print_prompt(){
-    printw(">");
 }
 
 MenuItem Display::get_item(){
@@ -61,8 +57,8 @@ MenuItem Display::get_item(){
                 getting_input = false;
             }
             break;
-        case ETX:
-        case EOT:
+        case CTRLD:
+        case CTRLC:
             return Menu::no_item;
         default:
             break;
@@ -79,19 +75,40 @@ pair<unsigned int, unsigned int> Display::get_last_sel(){
     return make_pair(last_selected_item, last_region_start);
 }
 
-bool Display::get_line(std::string& dest){
-    int ch = 0;
-    dest.clear();
-    while((ch = getch()) != '\n' && ch != EOT){
-        if(ch == KEY_BACKSPACE || ch == ALT_BACKSPACE){
-            if(dest.size()){
-                dest.pop_back();
+bool Display::get_string(const std::string& prompt, string& result){
+    return get_string(prompt.c_str(), result);
+}
+
+bool Display::get_string(const char* prompt, string& result){
+    clear();
+    attron(A_REVERSE);
+    printw(prompt);
+    standend();
+    addch('\n');
+    refresh();
+
+    result.clear();
+
+    bool get_input = true;
+    while(get_input){
+        char key = getch();
+        if(key >= ' ' && key <= '~'){
+            addch(key);
+            refresh();
+            result.push_back(key);
+        }else if(key == BACKSPACE){
+            if(result.size()){
+                printw("\b \b");
+                refresh();
+                result.pop_back();
             }
-        }else{
-            dest.push_back(ch);
+        }else if(key == CTRLD || key == CTRLC){
+            return false;
+        }else if (key == '\n'){
+            get_input = false;
         }
     }
-    return ch != EOT;
+    return true;
 }
 
 void Display::draw_menu(){
