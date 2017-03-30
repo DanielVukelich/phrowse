@@ -13,6 +13,7 @@ using std::exception;
 MenuItem Menu::no_item = MenuItem(MenuItem::special_type::NO_ITEM);
 MenuItem Menu::prev_item = MenuItem(MenuItem::special_type::PREV_ITEM);
 MenuItem Menu::next_item = MenuItem(MenuItem::special_type::NEXT_ITEM);
+MenuItem Menu::url_item = MenuItem(MenuItem::special_type::URL_ITEM);
 int Menu::display_width = 40;
 
 Menu::Menu(){
@@ -181,6 +182,13 @@ string MenuItem::describe_item() const{
         s.push_back(item_type);
         return s;
     }
+}
+
+MenuItem::MenuItem(const GURI& url){
+    ostringstream oss;
+    oss << "1\t" << url.get_resource()
+        << "\t" << url.get_formatted_host('\t');
+    *this = MenuItem(oss.str());
 }
 
 MenuItem::MenuItem(const string& gopher_line){

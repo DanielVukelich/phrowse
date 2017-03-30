@@ -69,19 +69,19 @@ void GURI::set_uri(const string& uri){
 
 }
 
-string GURI::get_host(){
+string GURI::get_host() const{
     return hostname;
 }
 
-string GURI::get_port(){
+string GURI::get_port() const{
     return port;
 }
 
-string GURI::get_resource(){
+string GURI::get_resource() const{
     return resource;
 }
 
-string GURI::get_formatted_host(char delimiter){
+string GURI::get_formatted_host(char delimiter) const{
     ostringstream oss;
     oss << hostname << delimiter << port;
     return oss.str();

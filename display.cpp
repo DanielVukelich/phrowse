@@ -57,6 +57,8 @@ MenuItem Display::get_item(){
                 getting_input = false;
             }
             break;
+        case 'g':
+            return Menu::url_item;
         case CTRLD:
         case CTRLC:
             return Menu::no_item;
@@ -113,6 +115,13 @@ bool Display::get_string(const char* prompt, string& result){
 
 void Display::draw_menu(){
     clear();
+
+    if(selected_item >= items.size()){
+        last_selected_item = selected_item;
+        last_region_start = region_start;
+        selected_item = 0;
+        region_start = 0;
+    }
 
     for(unsigned int i = region_start, j = 0;
         i < items.size() && j != (unsigned int) wind_y;

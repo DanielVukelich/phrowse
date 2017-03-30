@@ -1,6 +1,8 @@
 #ifndef _MENU_H
 #define _MENU_H
 
+#include "guri.h"
+
 #include <string>
 #include <vector>
 
@@ -9,6 +11,7 @@ class MenuItem{
 public:
     MenuItem(const std::string& gopher_line);
     MenuItem();
+    MenuItem(const GURI& url);
     std::string get_text() const;
     std::string get_selector() const;
     std::string describe_item() const;
@@ -23,6 +26,7 @@ private:
         NO_ITEM,
         PREV_ITEM,
         NEXT_ITEM,
+        URL_ITEM,
         NORMAL
     };
     MenuItem(special_type type);
@@ -46,6 +50,7 @@ public:
     static MenuItem no_item;
     static MenuItem prev_item;
     static MenuItem next_item;
+    static MenuItem url_item;
 private:
     static int display_width;
     std::vector<MenuItem> items;

@@ -51,20 +51,12 @@ int main(int argc, char** argv){
     GURI uri;
     get_args(argc, argv, uri, disp);
 
-    string host = uri.get_formatted_host('\t');
-    Connection conn(host);
-
-    string query = uri.get_resource();
-
-    string first_page_item = "1\t";
-    first_page_item.append(query);
-    first_page_item.append("\t");
-    first_page_item.append(host);
-    query.append("\r\n");
+    Connection conn(uri.get_formatted_host('\t'));
+    MenuItem firstpage(uri);
 
     Menu men;
     try{
-        men = Menu(conn.request(query));
+        men = Menu(conn.request(firstpage));
     }catch(runtime_error e){
         men = Menu::from_exception(e.what());
     }
@@ -72,7 +64,6 @@ int main(int argc, char** argv){
     disp.set_menu(men);
     disp.draw_menu();
 
-    MenuItem firstpage(first_page_item);
 
     BrowserHistory hist;
     hist.add_item(firstpage);
@@ -85,6 +76,24 @@ int main(int argc, char** argv){
             hist.set_fut_indices(disp.get_last_sel());
         }else if(to_visit.get_item() == Menu::next_item){
             to_visit = hist.go_forward();
+        }else if(to_visit.get_item() == Menu::url_item){
+            hist.clear_future();
+            hist.set_hist_indices(disp.get_last_sel());
+            string url;
+            string prompt = "Enter a gopher URL to visit:";
+            while(true){
+                try{
+                    if(!disp.get_string(prompt, url)){
+                        throw runtime_error("Please enter a URL");
+                    }
+                    GURI new_page(url);
+                    to_visit.get_item() = MenuItem(new_page);
+                    break;
+                }catch(runtime_error e){
+                    prompt = e.what();
+                    prompt.append("\nEnter a gopher URL to visit:");
+                }
+            }
         }else{
             hist.clear_future();
             hist.set_hist_indices(disp.get_last_sel());
@@ -92,7 +101,6 @@ int main(int argc, char** argv){
             if(to_visit.get_item().get_type() == '7'){
                 string query;
                 if(!disp.get_string("Enter a search query:", query)){
-                    //If the user canceled the search, exit
                     break;
                 }
                 to_visit.get_item().set_search(query);
