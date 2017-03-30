@@ -7,6 +7,7 @@
 
 #define ALT_BACKSPACE 127
 #define EOT 4
+#define ETX 3
 
 using std::ostringstream;
 using std::string;
@@ -60,6 +61,7 @@ MenuItem Display::get_item(){
                 getting_input = false;
             }
             break;
+        case ETX:
         case EOT:
             return Menu::no_item;
         default:
