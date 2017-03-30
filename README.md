@@ -17,3 +17,5 @@ Navigate documents with by using the arrow keys UP and DOWN.  Select menu items 
 
 ### Notes
 Not all gopher menu types are supported yet.  Only gopher menus, text documents, and search items are supported at the moment.  Trying to select an unsupported menu item may cause Phrowse to crash at the moment.
+
+At the moment, document caching is permanent for the Phrowse session.  That means that if you try to visit any gopherspaces that use dynamic content, the first version of that document you receive will be cached until you close phrowse.
