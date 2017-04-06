@@ -2,13 +2,11 @@
 
 #include <sstream>
 #include <stdexcept>
-#include <iostream>
 
 using std::ostringstream;
 using std::vector;
 using std::string;
 using std::runtime_error;
-using std::exception;
 
 MenuItem Menu::no_item = MenuItem(MenuItem::special_type::NO_ITEM);
 MenuItem Menu::prev_item = MenuItem(MenuItem::special_type::PREV_ITEM);
@@ -40,26 +38,7 @@ Menu::Menu(const string& gopher_doc, char doc_type){
     }
 
     for(unsigned int i = 0; i < lines.size(); ++i){
-
-        switch(doc_type){
-        case '0':
-        {
-            MenuItem newItem;
-            newItem.item_type = 'i';
-            newItem.item_text = lines.at(i);
-            newItem.selector_string = "";
-            items.push_back(newItem);
-        }
-            break;
-        case '7':
-        case '3':
-        case '1':
-            items.emplace_back(lines.at(i));
-            break;
-        default:
-            break;
-        }
-
+        items.emplace_back(doc_type, lines.at(i));
     }
 }
 
@@ -67,35 +46,11 @@ void Menu::set_display_width(int width){
     display_width = width;
 }
 
-void Menu::print_items(){
-    for(unsigned int i = 0; i < items.size(); ++i){
-        std::cout << items.at(i).get_text();
-        if(items.at(i).get_type() != 'i'){
-            std::cout << "\t" << items.at(i).get_selector();
-        }
-        std::cout << std::endl;
-    }
-}
-
 vector<string> Menu::get_lines(const string& gopher_doc,
                                char doc_type){
-    string delimiter, terminator;
-    int width;
-    switch(doc_type){
-    case '0':
-        delimiter = "\n";
-        terminator = "";
-        width = display_width;
-        break;
-    case '7':
-    case '3':
-    case '1':
-    default:
-        delimiter = "\r\n";
-        terminator = ".";
-        width = -1;
-        break;
-    }
+    string delimiter = MenuItem::get_delimiter(doc_type);
+    string terminator = MenuItem::get_terminator(doc_type);
+    int width = MenuItem::get_line_width(doc_type, display_width);
     return get_lines(gopher_doc, delimiter, terminator, width);
 }
 
@@ -141,129 +96,4 @@ size_t Menu::size(){
 
 MenuItem& Menu::at(size_t pos){
     return items.at(pos);
-}
-
-string MenuItem::describe_item() const{
-    switch(item_type){
-    case '0':
-        return string("File");
-    case '1':
-        return string("Gopher menu");
-    case '2':
-        return string("CSO server");
-    case '3':
-        return string("Error message");
-    case '4':
-        return string("Macintosh file");
-    case '5':
-        return string("DOS binary archive");
-    case '6':
-        return string("UNIX uuencoded file");
-    case '7':
-        return string("Index-Search server");
-    case '8':
-        return string("Telnet session");
-    case '9':
-        return string("Binary file");
-    case '+':
-        return string("Redundant server");
-    case 'T':
-        return string("tn3270 session");
-    case 'g':
-        return string("GIF image");
-    case 'i':
-        return string("Text/Information");
-    case 'I':
-        return string("Image");
-    case 'h':
-        return string("HTTP link");
-    default:
-        string s("Unknown item: ");
-        s.push_back(item_type);
-        return s;
-    }
-}
-
-MenuItem::MenuItem(const GURI& url){
-    ostringstream oss;
-    oss << "1\t" << url.get_resource()
-        << "\t" << url.get_formatted_host('\t');
-    *this = MenuItem(oss.str());
-}
-
-MenuItem::MenuItem(const string& gopher_line){
-    const string DELIMITER("\t");
-    attr = special_type::NORMAL;
-
-    if(!gopher_line.size()){
-        item_type = 'i';
-        item_text = "";
-        selector_string = "NULL\tNULL";
-        return;
-    }
-
-    size_t firsttab = gopher_line.find(DELIMITER);
-    if(firsttab == string::npos){
-        throw runtime_error("Couldn't parse menu item (no tabs)");
-    }
-
-    size_t secondtab = gopher_line.find(DELIMITER, firsttab + 1);
-    if(secondtab == string::npos){
-        throw runtime_error("Couldn't parse menu item (need at least 2 tabs)");
-    }
-
-    item_type = gopher_line.at(0);
-    item_text = gopher_line.substr(1, firsttab - 1);
-    selector_string = gopher_line.substr(firsttab + 1);
-}
-
-bool MenuItem::operator==(const MenuItem other) const{
-
-    if(attr != special_type::NORMAL){
-        return (attr == other.attr);
-    }
-
-    return other.item_type == item_type &&
-        other.item_text == item_text &&
-        other.selector_string == selector_string;
-}
-
-bool MenuItem::operator!=(const MenuItem other) const{
-    return !(*this == other);
-}
-MenuItem MenuItem::operator=(const MenuItem other){
-    item_type = other.item_type;
-    item_text = other.item_text;
-    selector_string = other.selector_string;
-    attr = other.attr;
-    return other;
-}
-
-string MenuItem::get_selector() const{
-    return selector_string;
-}
-
-string MenuItem::get_text() const {
-    return item_text;
-}
-
-char MenuItem::get_type() const{
-    return item_type;
-}
-
-
-MenuItem::MenuItem(){
-    attr = special_type::NORMAL;
-}
-
-MenuItem::MenuItem(special_type type){
-    attr = type;
-}
-
-void MenuItem::set_search(const std::string& query){
-    search = query;
-}
-
-string MenuItem::get_search() const{
-    return search;
 }

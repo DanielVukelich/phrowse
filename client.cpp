@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "display.h"
 #include "history.h"
+#include "menu_item.h"
 #include "guri.h"
 
 #include <iostream>
