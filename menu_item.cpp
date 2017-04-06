@@ -112,6 +112,8 @@ string MenuItem::describe_item() const{
         return string("Image");
     case 'h':
         return string("HTTP link");
+    case 'p':
+        return string("PNG image");
     default:
         string s("Unknown item: ");
         s.push_back(item_type);
