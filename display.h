@@ -11,6 +11,7 @@ class Display{
 public:
     Display();
     ~Display();
+    void print_text(const std::string& text);
     void set_menu(Menu new_menu);
     void draw_menu();
     MenuItem get_item();

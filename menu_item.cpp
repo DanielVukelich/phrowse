@@ -2,11 +2,14 @@
 
 #include <sstream>
 #include <string>
+#include <iostream>
 #include <stdexcept>
 
 using std::runtime_error;
 using std::ostringstream;
+using std::stringstream;
 using std::string;
+using std::getline;
 
 MenuItem::MenuItem(){
     attr = special_type::NORMAL;
@@ -55,6 +58,90 @@ void MenuItem::init_by_line(const string& gopher_line){
     item_type = gopher_line.at(0);
     item_text = gopher_line.substr(1, firsttab - 1);
     selector_string = gopher_line.substr(firsttab + 1);
+}
+
+bool MenuItem::can_select() const{
+    switch(item_type){
+    case '3':
+    case 'i':
+        return false;
+    case '0':
+    case '1':
+    case '2':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '+':
+    case 'T':
+    case 'g':
+    case 'I':
+    case 'h':
+    case 'p':
+    default:
+        return true;
+    }
+}
+
+
+bool MenuItem::is_binary() const{
+    switch(item_type){
+    case '4':
+    case '5':
+    case '6':
+    case 'g':
+    case 'I':
+    case 'h':
+    case 'p':
+        return true;
+    case '3':
+    case 'i':
+    case '0':
+    case '1':
+    case '2':
+    case '7':
+    case '8':
+    case '9':
+    case '+':
+    case 'T':
+    default:
+        return false;
+    }
+}
+
+void MenuItem::build_request(string& req, string& host) const{
+    string port;
+    stringstream ss(selector_string);
+    getline(ss, req, '\t');
+    getline(ss, host, '\t');
+    getline(ss, port, '\t');
+    host.push_back('\t');
+    host.append(port);
+    switch(item_type){
+    case '0':
+    case '1':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '9':
+    case '+':
+    case 'g':
+    case 'I':
+    case 'p':
+        break;
+    case '7':
+        req.push_back('\t');
+        req.append(search);
+        break;
+    default:
+        ostringstream err;
+        err << "Menu item type " << describe_item() << " not supported";
+        throw runtime_error(err.str());
+    }
+    req.append("\r\n");
 }
 
 void MenuItem::init_by_type(char type, const string& gopher_line){

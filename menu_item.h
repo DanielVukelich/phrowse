@@ -18,6 +18,9 @@ public:
     void set_search(const std::string& query);
     std::string get_search() const;
     char get_type() const;
+    bool is_binary() const;
+    bool can_select() const;
+    void build_request(std::string& req, std::string& host) const;
     bool operator==(const MenuItem other) const;
     bool operator!=(const MenuItem other) const;
     MenuItem operator=(const MenuItem other);

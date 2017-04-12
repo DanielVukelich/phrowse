@@ -73,6 +73,12 @@ MenuItem Display::get_item(){
     return items.at(selected_item);
 }
 
+void Display::print_text(const string& text){
+    clear();
+    printw(text.c_str());
+    refresh();
+}
+
 pair<unsigned int, unsigned int> Display::get_last_sel(){
     return make_pair(last_selected_item, last_region_start);
 }

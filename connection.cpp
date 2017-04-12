@@ -8,6 +8,9 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <fstream>
+#include <pwd.h>
+#include <sys/types.h>
 
 const unsigned int TIMEOUT_SECONDS = 10;
 const unsigned int TIMEOUT_USECONDS = 0;
@@ -17,10 +20,13 @@ const unsigned int SLOW_RETRIES = 5;
 const unsigned int SLEEP_USECONDS = 100000;
 const char* TERMINATING = "\r\n.\r\n";
 
+using std::ofstream;
+using std::vector;
 using std::ostringstream;
 using std::stringstream;
 using std::string;
 using std::runtime_error;
+
 
 Connection::Connection(){
     sockFD = 0;
@@ -45,7 +51,7 @@ void Connection::close_conn(){
 }
 
 void Connection::set_host(const string& host){
-    unsigned int pos = host.find('\t');
+    size_t pos = host.find('\t');
     if(pos == string::npos || pos == host.size() - 1){
         hostname = host;
         port = "70";
@@ -59,41 +65,18 @@ void Connection::set_host(const string& host){
 }
 
 string Connection::request(const MenuItem& item){
-    string req, host, port;
-    stringstream ss(item.get_selector());
-    switch(item.get_type()){
-    case '0':
-    case '1':
-        getline(ss, req, '\t');
-        getline(ss, host, '\t');
-        getline(ss, port, '\t');
-        host.push_back('\t');
-        host.append(port);
-        set_host(host);
-        break;
-    case '7':
-        getline(ss, req, '\t');
-        getline(ss, host, '\t');
-        getline(ss, port, '\t');
-        host.push_back('\t');
-        host.append(port);
-        set_host(host);
-        req.push_back('\t');
-        req.append(item.get_search());
-        break;
-    default:
-        return string();
-    }
-    req.append("\r\n");
-    return request(req);
+    string req, host;
+    item.build_request(req, host);
+    set_host(host);
+    return request(req, item.is_binary());
 }
 
 string Connection::request(const string& request, const string& host){
     set_host(host);
-    return this->request(request);
+    return this->request(request, false);
 }
 
-string Connection::request(const string& request){
+string Connection::request(const string& request, bool is_binary){
     string cache_key = hostname + port + request;
     auto it = cache.find(cache_key);
 
@@ -103,12 +86,89 @@ string Connection::request(const string& request){
 
     open();
     if(send_str(request)){
-        it = cache.emplace(cache_key, get_response()).first;
-        close_conn();
-        return it->second;
+        if(!is_binary){
+            it = cache.emplace(cache_key, get_response()).first;
+            close_conn();
+            return it->second;
+        }else{
+            string filename = "downloaded_file.dat";
+            size_t lastslash = request.rfind("/");
+            if(lastslash != string::npos){
+                size_t fname_len = request.size() - 3 - lastslash;
+                filename = request.substr(lastslash + 1, fname_len);
+            }
+
+            const char* homedir;
+            if ((homedir = getenv("HOME")) == NULL) {
+                homedir = getpwuid(getuid())->pw_dir;
+            }
+            string filepath (homedir);
+            filepath.append("/");
+            filepath.append(filename);
+
+            vector<char> data;
+            binary_response(data);
+            close_conn();
+
+            ofstream file(filepath, std::ofstream::binary);
+            file.write(&data[0], data.size());
+            file.close();
+
+            ostringstream oss;
+            oss << "iFile successfully downloaded to "
+                << filepath << "\tNULL\tNULL\r\n.\r\n";
+            return string(oss.str());
+        }
     }
     close_conn();
     return string();
+}
+
+void Connection::binary_response(vector<char>& data){
+    if(!connected){
+        throw runtime_error("Not connected to server!");
+    }
+
+    char* buf = new char[BUFFER_SIZE];
+    bool receiving = true;
+    unsigned int consec_empty = 0;
+
+    while(receiving){
+        ssize_t rec = recv(sockFD, (void*) buf, BUFFER_SIZE, 0);
+        if(rec == -1){
+            if(errno == EAGAIN || errno == EWOULDBLOCK){
+                receiving = false;
+            }else if(errno == ENOTCONN || errno == ECONNRESET){
+                close(sockFD);
+                connected = false;
+                receiving = false;
+            }else{
+                throw runtime_error(strerror(errno));
+            }
+        }else{
+            if(!rec){
+                if(consec_empty > FAST_RETRIES){
+                    if(consec_empty > FAST_RETRIES + SLOW_RETRIES){
+                        receiving = false;
+                        continue;
+                    }
+                    usleep(SLEEP_USECONDS);
+                }
+                ++consec_empty;
+            }else{
+                consec_empty = 0;
+                if(!data.size()){
+                    data.resize(rec);
+                    memcpy(&data[0], buf, rec);
+                }else{
+                    unsigned int dsize = data.size();
+                    data.resize(data.size() + rec);
+                    memcpy(&data[dsize], buf, rec);
+                }
+            }
+        }
+    }
+    delete[] buf;
 }
 
 string Connection::get_response(){

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class Connection{
 public:
@@ -13,12 +14,13 @@ public:
     ~Connection();
     void set_host(const std::string& host);
     std::string request(const std::string& request, const std::string& host);
-    std::string request(const std::string& request);
+    std::string request(const std::string& request, bool is_binary);
     std::string request(const MenuItem& item);
 private:
     void open();
     void close_conn();
     std::string get_response();
+    void binary_response(std::vector<char>& data);
     bool send_str(const std::string& request);
     std::string hostname;
     std::string port;

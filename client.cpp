@@ -52,6 +52,8 @@ int main(int argc, char** argv){
     GURI uri;
     get_args(argc, argv, uri, disp);
 
+    disp.print_text("Welcome to Phrowse!\n");
+
     Connection conn(uri.get_formatted_host('\t'));
     MenuItem firstpage(uri);
 
@@ -72,6 +74,10 @@ int main(int argc, char** argv){
 
     while((to_visit = HistoryItem(disp.get_item())).get_item() != Menu::no_item){
 
+        if(!to_visit.get_item().can_select()){
+            continue;
+        }
+
         if(to_visit.get_item() == Menu::prev_item){
             to_visit = hist.go_back();
             hist.set_fut_indices(disp.get_last_sel());
@@ -80,7 +86,7 @@ int main(int argc, char** argv){
         }else if(to_visit.get_item() == Menu::url_item){
             hist.clear_future();
             hist.set_hist_indices(disp.get_last_sel());
-            string url;
+            string url = "";
             string prompt = "Enter a gopher URL to visit:";
             while(true){
                 try{
@@ -116,7 +122,11 @@ int main(int argc, char** argv){
 
         try{
             string response = conn.request(to_visit.get_item());
-            men = Menu(response, to_visit.get_item().get_type());
+            if(to_visit.get_item().is_binary()){
+                men = Menu(response, '1');
+            }else{
+                men = Menu(response, to_visit.get_item().get_type());
+            }
         }catch(runtime_error e){
             men = Menu::from_exception(e.what());
         }
