@@ -91,6 +91,7 @@ bool MenuItem::is_binary() const{
     case '4':
     case '5':
     case '6':
+    case '9':
     case 'g':
     case 'I':
     case 'h':
@@ -103,7 +104,6 @@ bool MenuItem::is_binary() const{
     case '2':
     case '7':
     case '8':
-    case '9':
     case '+':
     case 'T':
     default:
