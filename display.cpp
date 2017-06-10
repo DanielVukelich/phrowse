@@ -13,6 +13,7 @@ using std::ostringstream;
 using std::string;
 using std::pair;
 using std::make_pair;
+using std::vector;
 
 Display::Display(){
     initscr();
@@ -146,18 +147,22 @@ void Display::draw_menu(){
                 attron(A_UNDERLINE);
         }
 
-        int printed_chars = 0;
+        vector<char> print_buffer;
+        //Reserve length + 2 for the newline and null terminator
+        print_buffer.reserve(it.length() + 2);
         for(unsigned int k = 0; k < it.length(); ++k){
             char c = it.at(k);
             if(is_printable(c)){
-                addch(c);
-                ++printed_chars;
+                print_buffer.push_back(c);
             }
         }
-        if(!printed_chars && selected_item == i){
-            addch(' ');
-        }
-        printw("\n");
+
+        if(!print_buffer.size())
+            print_buffer.push_back(' ');
+        print_buffer.push_back('\n');
+        print_buffer.push_back('\0');
+
+        printw(&print_buffer[0]);
         standend();
     }
 
@@ -179,7 +184,7 @@ void Display::draw_menu(){
 }
 
 bool Display::is_printable(char c){
-    return (c != '\r');
+    return (c == '\n' || (c >= ' ' && c <= '~'));
 }
 
 int Display::get_display_width(){
