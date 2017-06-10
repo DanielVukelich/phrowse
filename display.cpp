@@ -53,9 +53,7 @@ MenuItem Display::get_item(){
             move_cursor(wind_y);
             break;
         case '\n':
-            if(items.at(selected_item).get_type() != 'i'){
-                getting_input = false;
-            }
+            getting_input = !items.at(selected_item).can_select();
             break;
         case 'g':
             return Menu::url_item;
@@ -138,6 +136,8 @@ void Display::draw_menu(){
 
         if(selected_item == i){
             attron(A_REVERSE);
+            if(items.at(i).can_select())
+                attron(A_UNDERLINE);
         }
 
         int printed_chars = 0;
