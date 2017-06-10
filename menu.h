@@ -3,11 +3,13 @@
 
 #include "menu_item.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 class Menu{
 public:
+    Menu(const std::exception& e);
     Menu(const std::string& gopher_doc, char doc_type);
     Menu(const std::string& gopher_doc) : Menu(gopher_doc, '1'){}
     static Menu from_exception(const std::string& what);
@@ -21,6 +23,7 @@ public:
     static MenuItem next_item;
     static MenuItem url_item;
 private:
+    void parse_lines(const std::string& doc, char doc_type);
     static int display_width;
     std::vector<MenuItem> items;
     std::vector<std::string> get_lines(const std::string& gopher_doc,

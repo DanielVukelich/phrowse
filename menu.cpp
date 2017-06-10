@@ -17,24 +17,28 @@ int Menu::display_width = 40;
 Menu::Menu(){
 }
 
-Menu Menu::from_exception(const std::string& what){
+Menu::Menu(const std::exception& e){
     ostringstream ss;
     ss << "3Error while loading page:\tNULL\tNULL\r\n"
-       << "3" << what << "\tNULL\tNULL\r\n"
+       << "3" << e.what() << "\tNULL\tNULL\r\n"
        << ".\r\n";
-    return Menu(ss.str(), '3');
+    parse_lines(ss.str(), '3');
 }
 
 Menu::Menu(const string& gopher_doc, char doc_type){
+    parse_lines(gopher_doc, doc_type);
+}
+
+void Menu::parse_lines(const string& doc, char doc_type){
     vector<string> lines;
     try{
-        lines = get_lines(gopher_doc, doc_type);
-        if(!lines.size() && gopher_doc.size()){
+        lines = get_lines(doc, doc_type);
+        if(!lines.size() && doc.size()){
             throw runtime_error("Couldn't parse lines.  Trying in text mode");
         }
     }catch(runtime_error e){
         doc_type = '0';
-        lines = get_lines(gopher_doc, doc_type);
+        lines = get_lines(doc, doc_type);
     }
 
     for(unsigned int i = 0; i < lines.size(); ++i){

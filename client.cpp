@@ -61,7 +61,7 @@ int main(int argc, char** argv){
     try{
         men = Menu(conn.request(firstpage));
     }catch(runtime_error e){
-        men = Menu::from_exception(e.what());
+        men = Menu(e);
     }
 
     disp.set_menu(men);
@@ -128,7 +128,7 @@ int main(int argc, char** argv){
                 men = Menu(response, to_visit.get_item().get_type());
             }
         }catch(runtime_error e){
-            men = Menu::from_exception(e.what());
+            men = Menu(e);
         }
 
         hist.add_item(to_visit);
