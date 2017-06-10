@@ -57,6 +57,12 @@ MenuItem Display::get_item(){
             break;
         case 'g':
             return Menu::url_item;
+        case 'i':
+            move_cursor(next_selectable_dist(false));
+            break;
+        case 'k':
+            move_cursor(next_selectable_dist(true));
+            break;
         case CTRLD:
         case CTRLC:
             return Menu::no_item;
@@ -194,6 +200,8 @@ void Display::jump_to(pair<unsigned int, unsigned int> indices){
 }
 
 void Display::move_cursor(int amount){
+    if(!amount)
+        return;
 
     int temp_sel_item = (int) selected_item + amount;
     if(temp_sel_item < 0){
@@ -210,4 +218,34 @@ void Display::move_cursor(int amount){
     }else if(selection_diff >= wind_y){
         region_start += amount;
     }
+}
+
+int Display::next_selectable_dist(bool down){
+
+    bool searching = true;
+    bool firstloop = true;
+    unsigned int i = selected_item;
+    unsigned int foundpos = selected_item;
+
+    while(searching){
+        if(items.at(i).can_select() && !firstloop){
+            foundpos = i;
+            break;
+        }
+
+        if(down){
+            if(i + 1 < items.size())
+                ++i;
+            else
+                break;
+        }else{
+            if(i)
+                --i;
+            else
+                break;
+        }
+
+        firstloop = false;
+    }
+    return ((int)foundpos) - ((int)selected_item);
 }

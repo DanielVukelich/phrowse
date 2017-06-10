@@ -22,6 +22,7 @@ public:
     std::pair<unsigned int, unsigned int> get_last_sel();
 private:
     void move_cursor(int amount);
+    int next_selectable_dist(bool down);
     Menu items;
     unsigned int selected_item, region_start;
     int wind_x, wind_y;
