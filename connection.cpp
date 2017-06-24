@@ -65,6 +65,15 @@ void Connection::set_host(const string& host){
 }
 
 string Connection::request(const MenuItem& item){
+    if(!item.is_supported_type()){
+        ostringstream oss;
+        oss << "Currently, menu items of type '"
+            << item.get_type()
+            << "', "
+            << item.describe_item()
+            << " are not supported.";
+        throw runtime_error(oss.str());
+    }
     string req, host;
     item.build_request(req, host);
     set_host(host);

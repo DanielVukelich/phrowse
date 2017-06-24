@@ -62,9 +62,7 @@ void MenuItem::init_by_line(const string& gopher_line){
 
 bool MenuItem::can_select() const{
     switch(item_type){
-    case '3':
-    case 'i':
-        return false;
+    case '\0':
     case '0':
     case '1':
     case '2':
@@ -80,11 +78,39 @@ bool MenuItem::can_select() const{
     case 'I':
     case 'h':
     case 'p':
-    default:
         return true;
+    case '3':
+    case 'i':
+    default:
+        return false;
     }
 }
 
+bool MenuItem::is_supported_type() const{
+    switch(item_type){
+    case '0':
+    case '1':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '+':
+    case 'g':
+    case 'I':
+    case 'p':
+        return true;
+    case '\0':
+    case '2':
+    case '3':
+    case 'i':
+    case 'T':
+    case 'h':
+    default:
+        return false;
+    }
+}
 
 bool MenuItem::is_binary() const{
     switch(item_type){
@@ -97,6 +123,7 @@ bool MenuItem::is_binary() const{
     case 'h':
     case 'p':
         return true;
+    case '\0':
     case '3':
     case 'i':
     case '0':
@@ -136,6 +163,7 @@ void MenuItem::build_request(string& req, string& host) const{
         req.push_back('\t');
         req.append(search);
         break;
+    case '\0':
     default:
         ostringstream err;
         err << "Menu item type " << describe_item() << " not supported";
@@ -167,6 +195,8 @@ void MenuItem::init_by_type(char type, const string& gopher_line){
 
 string MenuItem::describe_item() const{
     switch(item_type){
+    case '\0':
+        return string("Internal Debug (Something is wrong)");
     case '0':
         return string("File");
     case '1':

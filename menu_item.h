@@ -20,6 +20,7 @@ public:
     char get_type() const;
     bool is_binary() const;
     bool can_select() const;
+    bool is_supported_type() const;
     void build_request(std::string& req, std::string& host) const;
     bool operator==(const MenuItem other) const;
     bool operator!=(const MenuItem other) const;
