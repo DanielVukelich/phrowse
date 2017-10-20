@@ -1,3 +1,8 @@
+#ifdef DEBUG
+#include <sys/prctl.h>
+#include <sanitizer/asan_interface.h>
+#endif
+
 #include "connection.h"
 #include "menu.h"
 #include "display.h"
@@ -44,7 +49,14 @@ void get_args(int argc, char** argv, GURI& uri, Display& disp){
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, char** argv){
+int maina(int argc, char** argv){
+
+#ifdef DEBUG
+    //When debug mode enabled, allow any process to attach
+    prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY);
+    //Write address sanitizer errors to log file
+    __sanitizer_set_report_path("asan.log");
+#endif
 
     Display disp;
     Menu::set_display_width(disp.get_display_width());

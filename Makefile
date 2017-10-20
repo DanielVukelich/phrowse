@@ -8,6 +8,7 @@ BIN=phrowse
 release:	$(BIN)
 
 debug:	CXXFLAGS += -DDEBUG -g -fsanitize=address -fsanitize=undefined
+debug:	LDLIBS += -lubsan
 debug:	$(BIN)
 
 .PHONY: clean all debug release
