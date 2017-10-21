@@ -49,7 +49,7 @@ void get_args(int argc, char** argv, GURI& uri, Display& disp){
     exit(EXIT_FAILURE);
 }
 
-int maina(int argc, char** argv){
+int main(int argc, char** argv){
 
 #ifdef DEBUG
     //When debug mode enabled, allow any process to attach
