@@ -28,6 +28,7 @@ private:
     int wind_x, wind_y;
     unsigned int last_selected_item, last_region_start;
     bool is_printable(char c);
+    void escape(std::vector<char>& buff, char c);
 };
 
 #endif

@@ -153,7 +153,7 @@ void Display::draw_menu(){
         for(unsigned int k = 0; k < it.length(); ++k){
             char c = it.at(k);
             if(is_printable(c)){
-                print_buffer.push_back(c);
+                escape(print_buffer, c);
             }
         }
 
@@ -181,6 +181,12 @@ void Display::draw_menu(){
 
 
     refresh();
+}
+
+void Display::escape(vector<char>& buff, char c){
+    if(c == '%')
+        buff.push_back('%');
+    buff.push_back(c);
 }
 
 bool Display::is_printable(char c){
