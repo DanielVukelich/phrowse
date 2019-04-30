@@ -4,8 +4,8 @@ A terminal based gopher browser
 ### Building
 
 ### Requirements
-*libncurses (or your system's equivalent package for ncurses headers)
-*libubsan (only required for debugging, should be included with your compiler's libs package)
+* libncurses (or your system's equivalent package for ncurses headers)
+* libubsan (only required for debugging, should be included with your compiler's libs package)
 
 ### Running
 Just
