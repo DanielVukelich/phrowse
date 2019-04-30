@@ -37,7 +37,7 @@ void get_args(int argc, char** argv, GURI& uri, Display& disp){
         try{
             uri.set_uri(arg);
             return;
-        }catch(runtime_error e){
+        }catch(runtime_error &e){
             disp.~Display();
             cout << e.what() << endl;
             print_usage(argv[0]);
@@ -72,7 +72,7 @@ int main(int argc, char** argv){
     Menu men;
     try{
         men = Menu(conn.request(firstpage));
-    }catch(runtime_error e){
+    }catch(runtime_error &e){
         men = Menu(e);
     }
 
@@ -108,7 +108,7 @@ int main(int argc, char** argv){
                     GURI new_page(url);
                     to_visit.get_item() = MenuItem(new_page);
                     break;
-                }catch(runtime_error e){
+                }catch(runtime_error &e){
                     prompt = e.what();
                     prompt.append("\nEnter a gopher URL to visit:");
                 }
@@ -139,7 +139,7 @@ int main(int argc, char** argv){
             }else{
                 men = Menu(response, to_visit.get_item().get_type());
             }
-        }catch(runtime_error e){
+        }catch(runtime_error &e){
             men = Menu(e);
         }
 

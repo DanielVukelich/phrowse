@@ -36,7 +36,7 @@ void Menu::parse_lines(const string& doc, char doc_type){
         if(!lines.size() && doc.size()){
             throw runtime_error("Couldn't parse lines.  Trying in text mode");
         }
-    }catch(runtime_error e){
+    }catch(runtime_error &e){
         doc_type = '0';
         lines = get_lines(doc, doc_type);
     }
