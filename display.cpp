@@ -17,8 +17,7 @@ using std::vector;
 
 Display::Display(){
     initscr();
-    wind_y = stdscr->_maxy;
-    wind_x = stdscr->_maxx;
+    getmaxyx(stdscr, wind_y, wind_x);
     raw();
     noecho();
     keypad(stdscr, true);
