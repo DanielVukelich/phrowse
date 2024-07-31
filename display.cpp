@@ -79,7 +79,7 @@ MenuItem Display::get_item(){
 
 void Display::print_text(const string& text){
     clear();
-    printw(text.c_str());
+    printw("%s", text.c_str());
     refresh();
 }
 
@@ -94,7 +94,7 @@ bool Display::get_string(const std::string& prompt, string& result){
 bool Display::get_string(const char* prompt, string& result){
     clear();
     attron(A_REVERSE);
-    printw(prompt);
+    printw("%s", prompt);
     standend();
     addch('\n');
     refresh();
@@ -161,7 +161,7 @@ void Display::draw_menu(){
         print_buffer.push_back('\n');
         print_buffer.push_back('\0');
 
-        printw(&print_buffer[0]);
+        printw("%s", &print_buffer[0]);
         standend();
     }
 
@@ -175,7 +175,7 @@ void Display::draw_menu(){
     move(wind_y + 1, 0);
 
     attron(A_REVERSE | A_STANDOUT);
-    printw(oss.str().c_str());
+    printw("%s", oss.str().c_str());
     standend();
 
 
